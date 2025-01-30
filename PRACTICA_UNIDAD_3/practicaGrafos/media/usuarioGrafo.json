@@ -1,0 +1,77 @@
+[
+  {
+    "id": 1,
+    "nombre": "Lionel",
+    "adyacencias": [
+      {
+        "destino": 5,
+        "peso": 8.047744
+      },
+      {
+        "destino": 2,
+        "peso": 3.391893
+      }
+    ],
+    "grado": 2
+  },
+  {
+    "id": 2,
+    "nombre": "Jaime",
+    "adyacencias": [
+      {
+        "destino": 5,
+        "peso": 6.157369
+      },
+      {
+        "destino": 3,
+        "peso": 3.9406931
+      }
+    ],
+    "grado": 2
+  },
+  {
+    "id": 3,
+    "nombre": "Alexis",
+    "adyacencias": [
+      {
+        "destino": 4,
+        "peso": 4.686399
+      },
+      {
+        "destino": 1,
+        "peso": 1.8509853
+      }
+    ],
+    "grado": 2
+  },
+  {
+    "id": 4,
+    "nombre": "e",
+    "adyacencias": [
+      {
+        "destino": 3,
+        "peso": 3.0886793
+      },
+      {
+        "destino": 5,
+        "peso": 2.7415705
+      }
+    ],
+    "grado": 2
+  },
+  {
+    "id": 5,
+    "nombre": "Pepe",
+    "adyacencias": [
+      {
+        "destino": 3,
+        "peso": 9.239494
+      },
+      {
+        "destino": 1,
+        "peso": 3.9664454
+      }
+    ],
+    "grado": 2
+  }
+]

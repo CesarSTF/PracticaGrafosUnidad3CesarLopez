@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualización del Grafo</title>
+    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <style>
+        #grafo {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ccc;
+        }
+        .resultado {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
+        .botones {
+            margin-bottom: 20px;
+        }
+        .botones button {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h2 class="text-warning">Grafo de Usuarios</h2>
+
+        <!-- Formulario para calcular el camino corto -->
+        <form action="/usuario/calcular_camino_corto" method="GET" class="botones">
+            <label for="origen">Origen:</label>
+            <input type="number" id="origen" name="origen" required>
+
+            <label for="destino">Destino:</label>
+            <input type="number" id="destino" name="destino" required>
+
+            <button type="submit" name="algoritmo" value="1">Calcular con Floyd</button>
+            <button type="submit" name="algoritmo" value="2">Calcular con Bellman-Ford</button>
+        </form>
+
+        <!-- Área para mostrar el grafo (solo si nodos y aristas están definidos) -->
+        {% if nodos and aristas %}
+        <div id="grafo"></div>
+        <script>
+            const nodos = {{ nodos | tojson }};
+            const aristas = {{ aristas | tojson }};
+
+            const container = document.getElementById('grafo');
+            const data = {
+                nodes: new vis.DataSet(nodos),
+                edges: new vis.DataSet(aristas),
+            };
+            const options = {
+                physics: {
+                    enabled: true,
+                },
+                edges: {
+                    color: '#2B7CE9',
+                },
+            };
+            const network = new vis.Network(container, data, options);
+        </script>
+        {% endif %}
+
+        <!-- Área para mostrar el resultado del camino corto -->
+        {% if resultado %}
+        <div class="resultado">
+            <h3>Resultado del Camino Corto:</h3>
+            <p>{{ resultado }}</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<script>
+    $(document).ready(function () {
+        function url_change() {
+            var url = "http://127.0.0.1:5000/usuario/search";
+            var search = $("#texto3").val();
+            var criterio = $("#criterio3").val();
+            var new_url = url + "/" + criterio + "/" + search;
+            $("#boton3").attr("href", new_url);
+        }
+
+        $("#texto3").keyup(function () {
+            url_change();
+        });
+        $("#criterio3").change(function () {
+            url_change();
+        });
+    });
+</script>
+
+<div class="pagetitle">
+    <h2>Lista de Usuarios</h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="alert alert-dismissible fade show" role="alert">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <a href="/usuario/register" class="btn btn-success">Agregar</a>
+
+    <div class="mt-3 mb-3">
+        <label for="criterio">Criterio:</label>
+        <select name="criterio" id="criterio3" class="form-control">
+            <option value="apellido">Apellido</option>
+            <option value="nombre">Nombre</option>
+        </select>
+
+        <label for="texto">Texto:</label>
+        <input type="text" id="texto3" name="texto" placeholder="Buscar..." value="{{ request.args.get('texto', '') }}"
+            class="form-control">
+
+        <div class="d-flex align-items-center">
+            <a id="boton3" class="btn btn-primary">
+                <i class="fas fa-search-times">Buscar</i>
+            </a>
+        </div>
+    </div>
+
+    <form method="GET" action="{{ url_for('usuario.home_usuario', atributo=criterio, orden=tipo) }}">
+        <select name="criterio" id="criterio">
+            <option value="apellido" {% if criterio=='apellido' %}selected{% endif %}>Apellido</option>
+            <option value="nombre" {% if criterio=='nombre' %}selected{% endif %}>Nombre</option>
+        </select>
+        <select name="tipo" id="tipo">
+            <option value="1" {% if tipo=='1' %}selected{% endif %}>Ascendente</option>
+            <option value="0" {% if tipo=='0' %}selected{% endif %}>Descendente</option>
+        </select>
+        <button type="submit">Ordenar</button>
+    </form>
+
+
+
+    <table class="table table-striped mt-4">
+        <thead>
+            <tr>
+                <th>Apellido</th>
+                <th>Nombre</th>
+                <th>Correo</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if lista %}
+            {% for usuario in lista %}
+            <tr>
+                <td>{{ usuario.apellido}}</td>
+                <td>{{ usuario.nombre }}</td>
+                <td>{{ usuario.correo }}</td>
+                <td>
+                    <a href="/usuario/editar/{{ usuario.id }}" class="btn btn-info">Modificar</a>
+                    <a href="{{ url_for('usuario.eliminar_familia', id=usuario.id) }}" class="btn btn-danger btn-sm"
+                        onclick="return confirm('¿Estas seguro de que quieres eliminar esta usuario?')">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+            {% else %}
+            <tr>
+                <td colspan="6" class="text-center">No hay Usuarios disponibles.</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+    <a href="{{ url_for('usuario.ver_grafo') }}" class="btn btn-primary">
+        <i class="bi bi-diagram-3"></i> Ver Grafo
+    </a>
+</div>
+{% endblock %}

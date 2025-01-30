@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Detalle del Usuario</h2>
+
+    {% if error %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+    {% else %}
+        <ul class="list-group">
+            <li class="list-group-item"><strong>Nombre:</strong> {{ usuario.nombre }}</li>
+            <li class="list-group-item"><strong>Apellido:</strong> {{ usuario.apellido }}</li>
+            <li class="list-group-item"><strong>Correo:</strong> {{ usuario.correo }}</li>
+        </ul>
+    {% endif %}
+
+    <a href="{{ url_for('tarea.home_tarea') }}" class="btn btn-secondary">Volver</a>
+</div>
+{% endblock %}
+
