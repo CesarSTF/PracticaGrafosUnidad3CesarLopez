@@ -13,7 +13,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import com.google.gson.JsonArray;
 import com.practicaGrafos.controller.dao.UsuarioDao;
 import com.practicaGrafos.controller.dao.services.UsuarioServices;
 import com.practicaGrafos.controller.excepcion.ValueAlreadyExistException;

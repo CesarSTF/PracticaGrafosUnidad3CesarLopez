@@ -53,51 +53,51 @@ public class UsuarioDao extends AdapterDao<Usuario> {
         }
 
         try {
-            JsonArray graphArray = new JsonArray();
+            StringBuilder graphJson = new StringBuilder();
+            graphJson.append("[");
 
             for (int i = 1; i <= graph.nro_Ver().intValue(); i++) {
                 Integer vertexId = Integer.valueOf(i);
-                JsonObject vertex = new JsonObject();
-
-                vertex.addProperty("id", vertexId);
-                vertex.addProperty("nombre", (String) graph.getLabelL(vertexId));
+                graphJson.append("{");
+                graphJson.append("\"id\":").append(vertexId).append(",");
+                graphJson.append("\"nombre\":\"").append(graph.getLabelL(vertexId)).append("\",");
 
                 LinkedList<Adycencia> adyacenciasList = graph.adyacencias(vertexId);
-                JsonArray edges = new JsonArray();
-
+                graphJson.append("\"adyacencias\":[");
                 if (adyacenciasList != null && !adyacenciasList.isEmpty()) {
                     Object[] adyArray = adyacenciasList.toArray();
-                    for (Object obj : adyArray) {
-                        if (obj instanceof Adycencia) {
-                            Adycencia ady = (Adycencia) obj;
-                            JsonObject edge = new JsonObject();
-                            edge.addProperty("destino", ady.getDestination());
-                            edge.addProperty("peso", ady.getWeight());
-                            edges.add(edge);
+                    for (int j = 0; j < adyArray.length; j++) {
+                        if (adyArray[j] instanceof Adycencia) {
+                            Adycencia ady = (Adycencia) adyArray[j];
+                            graphJson.append("{");
+                            graphJson.append("\"destino\":").append(ady.getDestination()).append(",");
+                            graphJson.append("\"peso\":").append(ady.getWeight());
+                            graphJson.append("}");
+                            if (j < adyArray.length - 1) {
+                                graphJson.append(",");
+                            }
                         }
                     }
                 }
-
-                vertex.add("adyacencias", edges);
-                vertex.addProperty("grado", edges.size());
-
-                graphArray.add(vertex);
+                graphJson.append("],");
+                graphJson.append("\"grado\":").append(adyacenciasList != null ? adyacenciasList.getSize() : 0);
+                graphJson.append("}");
+                if (i < graph.nro_Ver().intValue()) {
+                    graphJson.append(",");
+                }
             }
+
+            graphJson.append("]");
 
             Files.createDirectories(Paths.get("media/", new String[0]));
 
-            String jsonOutput = new GsonBuilder()
-                    .setPrettyPrinting()
-                    .create()
-                    .toJson(graphArray);
-
             Files.write(
                     Paths.get("media/" + graphFileName),
-                    jsonOutput.getBytes(),
+                    graphJson.toString().getBytes(),
                     new OpenOption[0]);
 
             System.out.println("Grafo guardado correctamente en: media/" + graphFileName);
-            System.out.println("JSON generado: \n" + jsonOutput);
+            System.out.println("JSON generado: \n" + graphJson.toString());
 
         } catch (Exception e) {
             System.err.println("Error al guardar el grafo: " + e.getMessage());
@@ -110,14 +110,18 @@ public class UsuarioDao extends AdapterDao<Usuario> {
             String content = new String(Files.readAllBytes(Paths.get("media/" + graphFileName)));
             JsonArray graphArray = JsonParser.parseString(content).getAsJsonArray();
 
-            graph = new GrapLabelNoDirect(Integer.valueOf(graphArray.size()), String.class);
+            graph = new GrapLabelNoDirect<>(graphArray.size(), String.class);
+
+            LinkedList<Integer> vertices = new LinkedList<>();
 
             for (JsonElement element : graphArray) {
                 JsonObject vertex = element.getAsJsonObject();
                 Integer id = vertex.get("id").getAsInt();
                 String nombre = vertex.get("nombre").getAsString();
                 graph.labelsVertices(id, nombre);
+                vertices.add(id); 
             }
+
             for (JsonElement element : graphArray) {
                 JsonObject vertex = element.getAsJsonObject();
                 Integer sourceId = vertex.get("id").getAsInt();
@@ -153,7 +157,7 @@ public class UsuarioDao extends AdapterDao<Usuario> {
                     Integer destino = random.nextInt(graph.nro_Ver().intValue()) + 1;
 
                     if (!destino.equals(i) && !graph.is_Edge(i, destino).booleanValue()) {
-                        float peso = random.nextFloat() * 10; 
+                        float peso = random.nextFloat() * 10;
                         graph.add_edge(i, destino, peso);
                         System.out.println("Conexión generada entre: " + i + " y " + destino + " con peso: " + peso);
                         successfulConnections++;
@@ -169,7 +173,7 @@ public class UsuarioDao extends AdapterDao<Usuario> {
     public void initializeGraph() {
         try {
             if (this.graph != null) {
-                return; 
+                return;
             }
 
             LinkedList<Usuario> usuarios = this.listAll();
@@ -454,20 +458,20 @@ public class UsuarioDao extends AdapterDao<Usuario> {
 
         String camino = "";
 
-        if (algoritmo == 1) { 
+        if (algoritmo == 1) {
             Floyd floydWarshall = new Floyd(graph, origen, destino);
-            camino = floydWarshall.caminoCorto(); 
+            camino = floydWarshall.caminoCorto();
 
             saveMatricesToJson(floydWarshall.getMatrices(), "floyd_matrices.json");
-        } else { 
+        } else {
             BellmanFord bellmanFord = new BellmanFord(graph, origen, destino);
-            camino = bellmanFord.caminoCorto(algoritmo); 
+            camino = bellmanFord.caminoCorto(algoritmo);
 
             saveMatricesToJson(bellmanFord.getMatrices(), "bellman_ford_matrices.json");
         }
 
         System.out.println("Camino corto calculado: " + camino);
-        return camino; 
+        return camino;
     }
 
     private void saveMatricesToJson(Object matrices, String fileName) {

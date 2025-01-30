@@ -1,48 +1,51 @@
 package com.practicaGrafos.controller.tda.graph.algoritmos;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.practicaGrafos.controller.tda.graph.GrapLabelNoDirect;
+import com.practicaGrafos.controller.tda.list.LinkedList;
 
 public class Floyd {
     private GrapLabelNoDirect<String> grafo;
     private int origen;
     private int destino;
-    private float[][] distancias;
-    private int[][] siguiente;
+    private LinkedList<LinkedList<Float>> distancias;
+    private LinkedList<LinkedList<Integer>> siguiente;
 
     public Floyd(GrapLabelNoDirect<String> grafo, int origen, int destino) {
         this.grafo = grafo;
         this.origen = origen;
         this.destino = destino;
         int n = grafo.nro_Ver();
-        this.distancias = new float[n + 1][n + 1];
-        this.siguiente = new int[n + 1][n + 1];
+        this.distancias = new LinkedList<>();
+        this.siguiente = new LinkedList<>();
         inicializarMatrices(n);
     }
 
     private void inicializarMatrices(int n) {
-        for (int i = 1; i <= n; i++) {
-            for (int j = 1; j <= n; j++) {
+        for (int i = 0; i <= n; i++) {
+            LinkedList<Float> filaDistancias = new LinkedList<>();
+            LinkedList<Integer> filaSiguiente = new LinkedList<>();
+            for (int j = 0; j <= n; j++) {
                 if (i == j) {
-                    distancias[i][j] = 0;
-                    siguiente[i][j] = -1;
+                    filaDistancias.add(0f);
+                    filaSiguiente.add(-1);
                 } else {
                     try {
                         float peso = grafo.getWeigth2(i, j);
                         if (Float.isNaN(peso) || peso <= 0) {
-                            distancias[i][j] = Float.MAX_VALUE;
-                            siguiente[i][j] = -1;
+                            filaDistancias.add(Float.MAX_VALUE);
+                            filaSiguiente.add(-1);
                         } else {
-                            distancias[i][j] = peso;
-                            siguiente[i][j] = j;
+                            filaDistancias.add(peso);
+                            filaSiguiente.add(j);
                         }
                     } catch (Exception e) {
-                        distancias[i][j] = Float.MAX_VALUE;
-                        siguiente[i][j] = -1;
+                        filaDistancias.add(Float.MAX_VALUE);
+                        filaSiguiente.add(-1);
                     }
                 }
             }
+            distancias.add(filaDistancias);
+            siguiente.add(filaSiguiente);
         }
     }
 
@@ -52,22 +55,26 @@ public class Floyd {
         return reconstruirCamino(origen, destino);
     }
 
-    private void aplicarFloydWarshall(int n) {
+    private void aplicarFloydWarshall(int n) throws Exception {
         for (int k = 1; k <= n; k++) {
             for (int i = 1; i <= n; i++) {
                 for (int j = 1; j <= n; j++) {
-                    if (distancias[i][k] != Float.MAX_VALUE && distancias[k][j] != Float.MAX_VALUE &&
-                            distancias[i][k] + distancias[k][j] < distancias[i][j]) {
-                        distancias[i][j] = distancias[i][k] + distancias[k][j];
-                        siguiente[i][j] = siguiente[i][k];
+                    float distanciaIK = distancias.get(i).get(k);
+                    float distanciaKJ = distancias.get(k).get(j);
+                    float distanciaIJ = distancias.get(i).get(j);
+
+                    if (distanciaIK != Float.MAX_VALUE && distanciaKJ != Float.MAX_VALUE &&
+                        distanciaIK + distanciaKJ < distanciaIJ) {
+                        distancias.get(i).set(j, distanciaIK + distanciaKJ);
+                        siguiente.get(i).set(j, siguiente.get(i).get(k));
                     }
                 }
             }
         }
     }
 
-    private String reconstruirCamino(int origen, int destino) {
-        if (siguiente[origen][destino] == -1) {
+    private String reconstruirCamino(int origen, int destino) throws Exception {
+        if (siguiente.get(origen).get(destino) == -1) {
             return "No hay camino";
         }
 
@@ -76,49 +83,37 @@ public class Floyd {
         float distanciaTotal = 0;
 
         while (actual != destino) {
-            if (siguiente[actual][destino] == -1) {
+            if (siguiente.get(actual).get(destino) == -1) {
                 return "Error: Camino interrumpido inesperadamente.";
             }
             camino.append(actual).append(" -> ");
-            distanciaTotal += distancias[actual][siguiente[actual][destino]];
-            actual = siguiente[actual][destino];
+            distanciaTotal += distancias.get(actual).get(siguiente.get(actual).get(destino));
+            actual = siguiente.get(actual).get(destino);
         }
         camino.append(destino);
-        distanciaTotal += distancias[actual][destino];
+        distanciaTotal += distancias.get(actual).get(destino);
 
         System.out.println("Distancia total recorrida: " + distanciaTotal);
 
         return "Camino: " + camino.toString() + "|" + "Distancia total: " + distanciaTotal;
     }
 
-    public JsonObject getMatrices() {
-        JsonObject matrices = new JsonObject();
-        matrices.add("distancias", crearJsonArray(distancias));
-        matrices.add("siguiente", crearJsonArray(siguiente));
-        return matrices;
-    }
-
-    private JsonArray crearJsonArray(float[][] matriz) {
-        JsonArray array = new JsonArray();
-        for (int i = 1; i < matriz.length; i++) {
-            JsonArray fila = new JsonArray();
-            for (int j = 1; j < matriz[i].length; j++) {
-                fila.add(matriz[i][j]);
+    public String getMatrices() throws Exception {
+        StringBuilder matrices = new StringBuilder();
+        matrices.append("Distancias:\n");
+        for (int i = 1; i < distancias.getSize(); i++) {
+            for (int j = 1; j < distancias.get(i).getSize(); j++) {
+                matrices.append(distancias.get(i).get(j)).append(" ");
             }
-            array.add(fila);
+            matrices.append("\n");
         }
-        return array;
-    }
-
-    private JsonArray crearJsonArray(int[][] matriz) {
-        JsonArray array = new JsonArray();
-        for (int i = 1; i < matriz.length; i++) {
-            JsonArray fila = new JsonArray();
-            for (int j = 1; j < matriz[i].length; j++) {
-                fila.add(matriz[i][j]);
+        matrices.append("Siguiente:\n");
+        for (int i = 1; i < siguiente.getSize(); i++) {
+            for (int j = 1; j < siguiente.get(i).getSize(); j++) {
+                matrices.append(siguiente.get(i).get(j)).append(" ");
             }
-            array.add(fila);
+            matrices.append("\n");
         }
-        return array;
+        return matrices.toString();
     }
 }
