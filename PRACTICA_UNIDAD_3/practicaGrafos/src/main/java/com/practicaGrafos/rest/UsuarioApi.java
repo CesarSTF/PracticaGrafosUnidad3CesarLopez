@@ -13,7 +13,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import com.google.gson.JsonArray;
 import com.practicaGrafos.controller.dao.UsuarioDao;
 import com.practicaGrafos.controller.dao.services.UsuarioServices;
 import com.practicaGrafos.controller.excepcion.ValueAlreadyExistException;
@@ -269,26 +268,15 @@ public class UsuarioApi {
         HashMap<String, Object> res = new HashMap<>();
 
         try {
-            // Crear una instancia de UsuarioServices
             UsuarioServices usuarioServices = new UsuarioServices();
-
-            // Obtener la lista de usuarios
             LinkedList<Usuario> lista = usuarioServices.listAll();
-
-            // Crear el grafo
             GrapLabelNoDirect<String> grafo = usuarioServices.crearGrafo();
-
-            // Guardar el grafo en un archivo
             usuarioServices.guardarGrafo();
-
-            // Generar conexiones aleatorias (opcional)
             usuarioServices.generarConexionesAleatorias();
-
-            // Preparar la respuesta
             res.put("estado", "Ok");
             res.put("msg", "Grafo creado y guardado con éxito.");
-            res.put("data", lista.toArray()); // Lista de usuarios
-            res.put("grafo", grafo); // Grafo creado (opcional, si deseas devolver el grafo en la respuesta)
+            res.put("data", lista.toArray()); 
+            res.put("grafo", grafo); 
             System.out.println("Ady" + grafo.toString());
 
             return Response.ok(res).build();
@@ -307,11 +295,9 @@ public class UsuarioApi {
             @PathParam("destino") int destino,
             @PathParam("algoritmo") int algoritmo) {
 
-        // Respuesta JSON
         HashMap<String, Object> response = new HashMap<>();
 
         try {
-            // Validar parámetros
             if (origen <= 0 || destino <= 0) {
                 throw new IllegalArgumentException("Los valores de origen y destino deben ser mayores que 0.");
             }

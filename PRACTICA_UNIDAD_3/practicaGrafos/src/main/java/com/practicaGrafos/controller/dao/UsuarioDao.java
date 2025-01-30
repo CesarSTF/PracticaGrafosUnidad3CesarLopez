@@ -55,16 +55,12 @@ public class UsuarioDao extends AdapterDao<Usuario> {
         try {
             JsonArray graphArray = new JsonArray();
 
-            // Iterar sobre todos los vértices
             for (int i = 1; i <= graph.nro_Ver().intValue(); i++) {
                 Integer vertexId = Integer.valueOf(i);
                 JsonObject vertex = new JsonObject();
 
-                // Información básica del vértice
                 vertex.addProperty("id", vertexId);
                 vertex.addProperty("nombre", (String) graph.getLabelL(vertexId));
-
-                // Obtener y procesar las adyacencias
                 LinkedList<Adycencia> adyacenciasList = graph.adyacencias(vertexId);
                 JsonArray edges = new JsonArray();
 
@@ -81,24 +77,17 @@ public class UsuarioDao extends AdapterDao<Usuario> {
                     }
                 }
 
-                // Añadir el array de adyacencias al vértice
                 vertex.add("adyacencias", edges);
                 vertex.addProperty("grado", edges.size());
-
-                // Añadir el vértice al array principal
                 graphArray.add(vertex);
             }
 
-            // Crear el directorio si no existe
             Files.createDirectories(Paths.get("media/", new String[0]));
-
-            // Convertir a JSON con formato legible
             String jsonOutput = new GsonBuilder()
                     .setPrettyPrinting()
                     .create()
                     .toJson(graphArray);
 
-            // Guardar el archivo
             Files.write(
                     Paths.get("media/" + graphFileName),
                     jsonOutput.getBytes(),
@@ -118,10 +107,8 @@ public class UsuarioDao extends AdapterDao<Usuario> {
             String content = new String(Files.readAllBytes(Paths.get("media/" + graphFileName)));
             JsonArray graphArray = JsonParser.parseString(content).getAsJsonArray();
 
-            // Inicializar el grafo con el número correcto de vértices
             graph = new GrapLabelNoDirect(Integer.valueOf(graphArray.size()), String.class);
 
-            // Primera pasada: establecer las etiquetas de los vértices
             for (JsonElement element : graphArray) {
                 JsonObject vertex = element.getAsJsonObject();
                 Integer id = vertex.get("id").getAsInt();
@@ -129,7 +116,6 @@ public class UsuarioDao extends AdapterDao<Usuario> {
                 graph.labelsVertices(id, nombre);
             }
 
-            // Segunda pasada: establecer las adyacencias
             for (JsonElement element : graphArray) {
                 JsonObject vertex = element.getAsJsonObject();
                 Integer sourceId = vertex.get("id").getAsInt();
@@ -155,20 +141,17 @@ public class UsuarioDao extends AdapterDao<Usuario> {
     public void generateRandomConnections() {
         try {
             Random random = new Random();
-            int connections = random.nextInt(3) + 2; // Genera entre 2 y 4 conexiones por vértice
+            int connections = random.nextInt(3) + 2; 
 
-            // Para cada vértice
             for (int i = 1; i <= graph.nro_Ver().intValue(); i++) {
                 int attemptedConnections = 0;
                 int successfulConnections = 0;
 
-                // Intentar crear el número deseado de conexiones
                 while (successfulConnections < connections && attemptedConnections < 10) {
                     Integer destino = random.nextInt(graph.nro_Ver().intValue()) + 1;
 
-                    // Evitar auto-conexiones y conexiones duplicadas
                     if (!destino.equals(i) && !graph.is_Edge(i, destino).booleanValue()) {
-                        float peso = random.nextFloat() * 10; // Peso entre 0 y 10
+                        float peso = random.nextFloat() * 10; 
                         graph.add_edge(i, destino, peso);
                         System.out.println("Conexión generada entre: " + i + " y " + destino + " con peso: " + peso);
                         successfulConnections++;
@@ -184,7 +167,7 @@ public class UsuarioDao extends AdapterDao<Usuario> {
     public void initializeGraph() {
         try {
             if (this.graph != null) {
-                return; // El grafo ya está inicializado
+                return; 
             }
 
             LinkedList<Usuario> usuarios = this.listAll();
@@ -195,7 +178,6 @@ public class UsuarioDao extends AdapterDao<Usuario> {
                     usuariosArray[i] = usuarios.get(i);
                 }
 
-                // Inicializar vértices con nombres de usuarios
                 for (int i = 0; i < usuariosArray.length; i++) {
                     this.graph.labelsVertices(i + 1, usuariosArray[i].getNombre());
                     // this.graph.insertEdgeL(usuariosArray[i].getNombre(),
@@ -212,7 +194,6 @@ public class UsuarioDao extends AdapterDao<Usuario> {
         return Files.exists(Paths.get(GRAPH_PATH + graphFileName));
     }
 
-    // Getters y setters para el grafo
     public GrapLabelNoDirect<String> getGraph() {
         return this.graph;
     }
@@ -461,9 +442,7 @@ public class UsuarioDao extends AdapterDao<Usuario> {
         return g.toJson(get(Index));
     }
 
-    // Método para calcular el camino corto
     public String caminoCorto(int origen, int destino, int algoritmo) throws Exception {
-        // Cargar el grafo desde el archivo .json
         loadGraph();
 
         if (graph == null) {
@@ -474,23 +453,19 @@ public class UsuarioDao extends AdapterDao<Usuario> {
 
         String camino = "";
 
-        if (algoritmo == 1) { // Usar algoritmo de Floyd
+        if (algoritmo == 1) { 
             Floyd floydWarshall = new Floyd(graph, origen, destino);
-            camino = floydWarshall.caminoCorto(); // Se asume que Floyd tiene un método para calcular el camino corto
-
-            // Guardar las matrices de adyacencia en un nuevo archivo .json
+            camino = floydWarshall.caminoCorto(); 
             saveMatricesToJson(floydWarshall.getMatrices(), "floyd_matrices.json");
-        } else { // Usar algoritmo de Bellman-Ford (o cualquier otro algoritmo como Dijkstra)
+        } else { 
             BellmanFord bellmanFord = new BellmanFord(graph, origen, destino);
-            camino = bellmanFord.caminoCorto(algoritmo); // Se asume que BellmanFord tiene un método para calcular el
-                                                         // camino corto
+            camino = bellmanFord.caminoCorto(algoritmo);
 
-            // Guardar las matrices de adyacencia en un nuevo archivo .json
             saveMatricesToJson(bellmanFord.getMatrices(), "bellman_ford_matrices.json");
         }
 
         System.out.println("Camino corto calculado: " + camino);
-        return camino; // Regresar el camino calculado
+        return camino; 
     }
 
     private void saveMatricesToJson(Object matrices, String fileName) {
@@ -498,10 +473,7 @@ public class UsuarioDao extends AdapterDao<Usuario> {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             String jsonOutput = gson.toJson(matrices);
 
-            // Crear el directorio si no existe
             Files.createDirectories(Paths.get("media/", new String[0]));
-
-            // Guardar el archivo
             Files.write(
                     Paths.get("media/" + fileName),
                     jsonOutput.getBytes(),
