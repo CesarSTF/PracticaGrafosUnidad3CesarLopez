@@ -61,6 +61,7 @@ public class UsuarioDao extends AdapterDao<Usuario> {
 
                 vertex.addProperty("id", vertexId);
                 vertex.addProperty("nombre", (String) graph.getLabelL(vertexId));
+
                 LinkedList<Adycencia> adyacenciasList = graph.adyacencias(vertexId);
                 JsonArray edges = new JsonArray();
 
@@ -79,10 +80,12 @@ public class UsuarioDao extends AdapterDao<Usuario> {
 
                 vertex.add("adyacencias", edges);
                 vertex.addProperty("grado", edges.size());
+
                 graphArray.add(vertex);
             }
 
             Files.createDirectories(Paths.get("media/", new String[0]));
+
             String jsonOutput = new GsonBuilder()
                     .setPrettyPrinting()
                     .create()
@@ -115,7 +118,6 @@ public class UsuarioDao extends AdapterDao<Usuario> {
                 String nombre = vertex.get("nombre").getAsString();
                 graph.labelsVertices(id, nombre);
             }
-
             for (JsonElement element : graphArray) {
                 JsonObject vertex = element.getAsJsonObject();
                 Integer sourceId = vertex.get("id").getAsInt();
@@ -141,7 +143,7 @@ public class UsuarioDao extends AdapterDao<Usuario> {
     public void generateRandomConnections() {
         try {
             Random random = new Random();
-            int connections = random.nextInt(3) + 2; 
+            int connections = random.nextInt(3) + 2;
 
             for (int i = 1; i <= graph.nro_Ver().intValue(); i++) {
                 int attemptedConnections = 0;
@@ -444,7 +446,6 @@ public class UsuarioDao extends AdapterDao<Usuario> {
 
     public String caminoCorto(int origen, int destino, int algoritmo) throws Exception {
         loadGraph();
-
         if (graph == null) {
             throw new Exception("Grafo no existe");
         }
@@ -456,10 +457,11 @@ public class UsuarioDao extends AdapterDao<Usuario> {
         if (algoritmo == 1) { 
             Floyd floydWarshall = new Floyd(graph, origen, destino);
             camino = floydWarshall.caminoCorto(); 
+
             saveMatricesToJson(floydWarshall.getMatrices(), "floyd_matrices.json");
         } else { 
             BellmanFord bellmanFord = new BellmanFord(graph, origen, destino);
-            camino = bellmanFord.caminoCorto(algoritmo);
+            camino = bellmanFord.caminoCorto(algoritmo); 
 
             saveMatricesToJson(bellmanFord.getMatrices(), "bellman_ford_matrices.json");
         }

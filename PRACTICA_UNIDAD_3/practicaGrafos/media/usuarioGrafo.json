@@ -5,11 +5,11 @@
     "adyacencias": [
       {
         "destino": 5,
-        "peso": 8.047744
+        "peso": 7.657481
       },
       {
-        "destino": 2,
-        "peso": 3.391893
+        "destino": 3,
+        "peso": 0.06377816
       }
     ],
     "grado": 2
@@ -19,12 +19,12 @@
     "nombre": "Jaime",
     "adyacencias": [
       {
-        "destino": 5,
-        "peso": 6.157369
+        "destino": 3,
+        "peso": 0.7622951
       },
       {
-        "destino": 3,
-        "peso": 3.9406931
+        "destino": 4,
+        "peso": 8.070918
       }
     ],
     "grado": 2
@@ -34,12 +34,12 @@
     "nombre": "Alexis",
     "adyacencias": [
       {
-        "destino": 4,
-        "peso": 4.686399
+        "destino": 5,
+        "peso": 2.0928466
       },
       {
-        "destino": 1,
-        "peso": 1.8509853
+        "destino": 4,
+        "peso": 3.2667751
       }
     ],
     "grado": 2
@@ -49,12 +49,12 @@
     "nombre": "e",
     "adyacencias": [
       {
-        "destino": 3,
-        "peso": 3.0886793
+        "destino": 5,
+        "peso": 0.8511996
       },
       {
-        "destino": 5,
-        "peso": 2.7415705
+        "destino": 6,
+        "peso": 5.8139367
       }
     ],
     "grado": 2
@@ -64,12 +64,27 @@
     "nombre": "Pepe",
     "adyacencias": [
       {
-        "destino": 3,
-        "peso": 9.239494
+        "destino": 1,
+        "peso": 6.6314754
       },
       {
+        "destino": 3,
+        "peso": 1.3011402
+      }
+    ],
+    "grado": 2
+  },
+  {
+    "id": 6,
+    "nombre": "Cesar",
+    "adyacencias": [
+      {
         "destino": 1,
-        "peso": 3.9664454
+        "peso": 9.458958
+      },
+      {
+        "destino": 2,
+        "peso": 7.9930162
       }
     ],
     "grado": 2
