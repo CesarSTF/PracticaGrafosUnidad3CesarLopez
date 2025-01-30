@@ -184,18 +184,15 @@ def ver_grafo():
         aristas = []
         print("Aristas: ", aristas)
         
-        # Lista de IDs de nodos para validación
         id_nodos = [usuario['id'] for usuario in usuarios]
-        id_nodos_set = set(id_nodos)  # Para búsquedas más eficientes
+        id_nodos_set = set(id_nodos)  
         
-        # Recorremos cada nodo de la lista de adyacencias, comenzando desde el índice 1
-        for i, nodo in zip(id_nodos, grafo_adyacencias[1:]):  # Saltamos el primer nodo que es None
+        for i, nodo in zip(id_nodos, grafo_adyacencias[1:]): 
             if not nodo or 'head' not in nodo:
-                continue  # Saltar nodos sin adyacencias o con estructura inválida
+                continue  
             
             current = nodo['head']
             while current:
-                # Añadimos la arista solo si el destino no es el mismo nodo y existe en la lista de nodos
                 if current['data']['destination'] in id_nodos_set and current['data']['destination'] != i:
                     aristas.append({
                         "from": i,
@@ -203,9 +200,9 @@ def ver_grafo():
                         "label": str(current['data']['weight']),
                         "arrows": 'to',
                     })
-                current = current.get('next')  # Usamos .get() para evitar errores si 'next' no existe
+                current = current.get('next')  
 
-        print("Aristas extraídas:", aristas)  # Depuración: Verificar las aristas extraídas
+        print("Aristas extraídas:", aristas)  
         
         return render_template('usuario/grafo.html', nodos=nodos, aristas=aristas)
 

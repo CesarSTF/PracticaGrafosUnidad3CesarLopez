@@ -29,7 +29,6 @@
     <div class="container mt-4">
         <h2 class="text-warning">Grafo de Usuarios</h2>
 
-        <!-- Formulario para calcular el camino corto -->
         <form action="/usuario/calcular_camino_corto" method="GET" class="botones">
             <label for="origen">Origen:</label>
             <input type="number" id="origen" name="origen" required>
@@ -41,7 +40,6 @@
             <button type="submit" name="algoritmo" value="2">Calcular con Bellman-Ford</button>
         </form>
 
-        <!-- Área para mostrar el grafo (solo si nodos y aristas están definidos) -->
         {% if nodos and aristas %}
         <div id="grafo"></div>
         <script>
